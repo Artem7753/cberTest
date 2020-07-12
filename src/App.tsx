@@ -7,7 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import AppHeader from "./Components/AppHeader";
 import Footer from "./Components/Footer";
 import { GlobalContext, Currency } from "./globalContext";
-import { getCurrencyList } from "./http/converter-service";
+import { getCurrencyRates } from "./http/converter-service";
 
 const MainPage = lazy(() => import("./Pages/MainPage"));
 const ConverterPage = lazy(() => import("./Pages/ConverterPage"));
@@ -15,24 +15,29 @@ const ConverterPage = lazy(() => import("./Pages/ConverterPage"));
 const App = () => {
     const [currencyList, setCurrencyList] = useState<Currency[]>([]);
     const [favoriteCurrencyList, setFavoriteCurrencyList] = useState<Currency[]>([]);
+    const [baseCurrency, setBaseCurrency] = useState('USD');
 
     useEffect(() => {
-        getCurrencyList().then((currencyListObj) => {
-            const currencyList = [];
+        getCurrencyRates(baseCurrency).then((currencyListObj) => {
+            const currencyList: Currency[] = [];
 
-            for (let key in currencyListObj?.results) {
-                currencyList.push(currencyListObj?.results[key] as Currency);
+            for (let key in currencyListObj?.rates) {
+                if(currencyListObj?.rates[key]) {
+                    currencyList.push({name: key, rate: currencyListObj?.rates[key]});
+                }
             }
 
             setCurrencyList(currencyList);
         });
-    }, []);
+    }, [baseCurrency]);
 
     const globalCtx = {
         currencyList,
         setCurrencyList,
         favoriteCurrencyList,
         setFavoriteCurrencyList,
+        baseCurrency,
+        setBaseCurrency,
     };
 
     return (

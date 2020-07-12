@@ -1,9 +1,8 @@
 import React from 'react';
 
 export type Currency = {
-    currencyName: string,
-    currencySymbol: string,
-    id: string
+    name: string;
+    rate: string;
 };
 
 export type GlobalContextType = {
@@ -11,6 +10,8 @@ export type GlobalContextType = {
     setCurrencyList: (currencies: Currency[] ) => void;
     favoriteCurrencyList: Currency[];
     setFavoriteCurrencyList: (currencies: Currency[]) => void;
+    baseCurrency: string;
+    setBaseCurrency: (currency: string) => void;
 };
 
 export const GlobalContext = React.createContext<GlobalContextType>({
@@ -18,4 +19,6 @@ export const GlobalContext = React.createContext<GlobalContextType>({
     setCurrencyList: () => {},
     favoriteCurrencyList: [],
     setFavoriteCurrencyList: () => {},
+    baseCurrency: '',
+    setBaseCurrency: () => {},
 });

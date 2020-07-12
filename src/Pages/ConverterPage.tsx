@@ -1,9 +1,9 @@
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Select, InputNumber } from "antd";
-import { getConvertedCurrency } from "../http/converter-service";
 import { GlobalContext } from "../globalContext";
+import { getCurrencyRates } from "../http/converter-service";
 
 const pageWrapper = css`
     flex: 1;
@@ -35,23 +35,20 @@ const ConverterPage = () => {
     const globalCtx = useContext(GlobalContext);
     const [currentFrom, setCurrentFrom] = useState<string>(from || "");
     const [currentTo, setCurrentTo] = useState<string>("");
-    const [currentRelation, setCurrentRelation] = useState<number>();
+    const [currentRateObj, setCurrentRateObj] = useState<Record<string,string>>({});
     const [currentValue, setCurrentValue] = useState<number>(1);
 
     const handleSelect = (type: "from" | "to", value: string) => {
         type === "from" ? setCurrentFrom(value) : setCurrentTo(value);
-        const firstKey = (type === 'from' ? value : currentFrom);
-        const secondKey = (type === 'to' ? value : currentTo);
-
-        if (firstKey && secondKey) {
-            getConvertedCurrency(firstKey, secondKey).then((relation) => {
-                const relationKey = `${firstKey}_${secondKey}`;
-                if (relation) {
-                    setCurrentRelation(+relation[relationKey].val || 0);
-                }
-            });
-        }
     };
+
+    useEffect(() => {
+        getCurrencyRates(currentFrom).then((rateObj) => {
+            if (rateObj) {
+                setCurrentRateObj(rateObj.rates);
+            }
+        });
+    }, [currentFrom]);
 
     return (
         <div css={pageWrapper}>
@@ -64,8 +61,8 @@ const ConverterPage = () => {
                         css={inputStyle}
                     >
                         {globalCtx.currencyList.map((currency) => (
-                            <Select.Option value={currency.id}>
-                                {currency.currencyName}
+                            <Select.Option value={currency.name}>
+                                {currency.name}
                             </Select.Option>
                         ))}
                     </Select>
@@ -77,8 +74,8 @@ const ConverterPage = () => {
                         css={inputStyle}
                     >
                         {globalCtx.currencyList.map((currency) => (
-                            <Select.Option value={currency.id}>
-                                {currency.currencyName}
+                            <Select.Option value={currency.name}>
+                                {currency.name}
                             </Select.Option>
                         ))}
                     </Select>
@@ -89,8 +86,8 @@ const ConverterPage = () => {
                         onChange={(value) => value && setCurrentValue(+value)}
                         css={inputStyle}
                     />
-                    {currentRelation && currentValue && (
-                        <div>Результат: {currentValue * currentRelation}</div>
+                    {currentFrom && currentTo && currentValue && (
+                        <div>Результат: {currentValue * +currentRateObj[currentTo]}</div>
                     )}
                 </div>
             </div>

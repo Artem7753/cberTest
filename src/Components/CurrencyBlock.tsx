@@ -19,6 +19,11 @@ const nameStyle = css`
     width: 40%;
 `;
 
+const rateStyle = css`
+    width: 100px;
+    margin-right: 12px;
+`;
+
 const converterButtonStyle = css`
     width: 300px;
     margin-right: 16px;
@@ -30,23 +35,23 @@ interface ICurrencyBlockProps extends Currency {
 }
 
 const CurrencyBlock = ({
-    currencyName,
-    currencySymbol,
-    id,
+    name,
+    rate,
     isFavorite,
     toggleCurrencyFavorite
 }: ICurrencyBlockProps) => {
     const history = useHistory();
 
     const handleRedirect = () => {
-        history.push(`/converter?from=${id}`);
+        history.push(`/converter?from=${name}`);
     }
 
     return (
         <div css={currencyWrapperStyle}>
-            <div css={nameStyle}>{currencyName}</div>
+            <div css={nameStyle}>{name}</div>
+            <div css={rateStyle}>{rate}</div>
             <Button type="primary" css={converterButtonStyle} onClick={handleRedirect}>
-                Перейти в конвертер {currencySymbol}
+                Перейти в конвертер
             </Button>
             <Button type={isFavorite ? 'primary' : 'default'} shape="circle" onClick={() => toggleCurrencyFavorite()}>
                 ❤
