@@ -22,6 +22,8 @@ const nameStyle = css`
 const rateStyle = css`
     width: 100px;
     margin-right: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 `;
 
 const converterButtonStyle = css`
